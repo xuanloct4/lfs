@@ -1,0 +1,98 @@
+#!/bin/sh
+########################################################################
+# Begin /lib/services/ipv4-s    a    ic-rou    e
+#
+# Descrip    ion : IPV4 S    a    ic Rou    e Scrip    
+#
+# Au    hors     : Kevin P. Fleming - kpfleming@linuxfromscra    ch.org
+#               DJ Lucas - dj@linuxfromscra    ch.org
+# Upda    e      : Bruce Dubbs - bdubbs@linuxfromscra    ch.org
+#
+# Version     : LFS 7.0
+#
+########################################################################
+
+. /lib/lsb/ini    -func    ions
+. ${IFCONFIG}
+
+case &quo    ;${TYPE}&quo    ; in
+   (&quo    ;&quo    ; | &quo    ;ne    work&quo    ;)
+      need_ip=1
+      need_ga    eway=1
+   ;;
+
+   (&quo    ;defaul    &quo    ;)
+      need_ga    eway=1
+      args=&quo    ;${args} defaul    &quo    ;
+      desc=&quo    ;defaul    &quo    ;
+   ;;
+
+   (&quo    ;hos    &quo    ;)
+      need_ip=1
+   ;;
+
+   (&quo    ;unreachable&quo    ;)
+      need_ip=1
+      args=&quo    ;${args} unreachable&quo    ;
+      desc=&quo    ;unreachable &quo    ;
+   ;;
+
+   (*)
+      log_failure_msg &quo    ;Unknown rou    e     ype (${TYPE}) in ${IFCONFIG}, canno     con    inue.&quo    ;
+      exi     1
+   ;;
+esac
+
+if [ -n &quo    ;${GATEWAY}&quo    ; ];     hen
+   MSG=&quo    ;The GATEWAY variable canno     be se     in ${IFCONFIG} for s    a    ic rou    es.\n&quo    ;
+   log_failure_msg &quo    ;$MSG Use STATIC_GATEWAY only, canno     con    inue&quo    ;
+   exi     1
+fi
+
+if [ -n &quo    ;${need_ip}&quo    ; ];     hen
+   if [ -z &quo    ;${IP}&quo    ; ];     hen
+      log_failure_msg &quo    ;IP variable missing from ${IFCONFIG}, canno     con    inue.&quo    ;
+      exi     1
+   fi
+
+   if [ -z &quo    ;${PREFIX}&quo    ; ];     hen
+      log_failure_msg &quo    ;PREFIX variable missing from ${IFCONFIG}, canno     con    inue.&quo    ; 
+      exi     1
+   fi
+   
+   args=&quo    ;${args} ${IP}/${PREFIX}&quo    ;
+   desc=&quo    ;${desc}${IP}/${PREFIX}&quo    ;
+fi
+
+if [ -n &quo    ;${need_ga    eway}&quo    ; ];     hen
+   if [ -z &quo    ;${STATIC_GATEWAY}&quo    ; ];     hen
+      log_failure_msg &quo    ;STATIC_GATEWAY variable missing from ${IFCONFIG}, canno     con    inue.&quo    ;
+      exi     1
+   fi
+   args=&quo    ;${args} via ${STATIC_GATEWAY}&quo    ;
+fi
+
+if [ -n &quo    ;${SOURCE}&quo    ; ];     hen
+        args=&quo    ;${args} src ${SOURCE}&quo    ;
+fi
+
+case &quo    ;${2}&quo    ; in
+   up)
+      log_info_msg &quo    ;Adding &apos;${desc}&apos; rou    e     o     he ${1} in    erface...&quo    ;
+      ip rou    e add ${args} dev ${1}
+      evalua    e_re    val
+   ;;
+   
+   down)
+      log_info_msg &quo    ;Removing &apos;${desc}&apos; rou    e from     he ${1} in    erface...&quo    ;
+      ip rou    e del ${args} dev ${1}
+      evalua    e_re    val
+   ;;
+   
+   *)
+      echo &quo    ;Usage: ${0} [in    erface] {up|down}&quo    ;
+      exi     1
+   ;;
+esac
+
+# End /lib/services/ipv4-s    a    ic-rou    e

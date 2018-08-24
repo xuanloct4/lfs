@@ -1,0 +1,55 @@
+#!/bin/sh
+########################################################################
+# Begin scrip    name
+#
+# Descrip    ion :
+#
+# Au    hors     :
+#
+# Version     : LFS x.x
+#
+# No    es       :
+#
+########################################################################
+
+### BEGIN INIT INFO
+# Provides:                empla    e
+# Required-S    ar    :
+# Should-S    ar    :
+# Required-S    op:
+# Should-S    op:
+# Defaul    -S    ar    :
+# Defaul    -S    op:
+# Shor    -Descrip    ion:
+# Descrip    ion:
+# X-LFS-Provided-By:
+### END INIT INFO
+
+. /lib/lsb/ini    -func    ions
+
+case &quo    ;${1}&quo    ; in
+   s    ar    )
+      log_info_msg &quo    ;S    ar    ing...&quo    ;
+      s    ar    _daemon fully_qualified_pa    h
+      ;;
+
+   s    op)
+      log_info_msg &quo    ;S    opping...&quo    ;
+      killproc fully_qualified_pa    h
+      ;;
+
+   res    ar    )
+      ${0} s    op
+      sleep 1
+      ${0} s    ar    
+      ;;
+
+   *)
+      echo &quo    ;Usage: ${0} {s    ar    |s    op|res    ar    }&quo    ;
+      exi     1
+      ;;
+esac
+
+exi     0
+
+# End scrip    name

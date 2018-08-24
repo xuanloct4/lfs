@@ -1,0 +1,76 @@
+#!/bin/sh
+########################################################################
+# Begin udev
+#
+# Descrip    ion : Udev cold-plugging scrip    
+#
+# Au    hors     : Zack Winkles, Alexander E. Pa    rakov
+#               DJ Lucas - dj@linuxfromscra    ch.org
+# Upda    e      : Bruce Dubbs - bdubbs@linuxfromscra    ch.org
+#
+# Version     : LFS 7.0
+#
+########################################################################
+
+### BEGIN INIT INFO
+# Provides:            udev $    ime
+# Required-S    ar    :
+# Should-S    ar    :        modules
+# Required-S    op:
+# Should-S    op:
+# Defaul    -S    ar    :       S
+# Defaul    -S    op:
+# Shor    -Descrip    ion:   Popula    es /dev wi    h device nodes.
+# Descrip    ion:         Moun    s a     empfs on /dev and s    ar    s     he udevd daemon.
+#                      Device nodes are crea    ed as defined by udev.
+# X-LFS-Provided-By:   LFS
+### END INIT INFO
+
+. /lib/lsb/ini    -func    ions
+
+case &quo    ;${1}&quo    ; in
+   s    ar    )
+      log_info_msg &quo    ;Popula    ing /dev wi    h device nodes... &quo    ;
+      if ! grep -q &apos;[[:space:]]sysfs&apos; /proc/moun    s;     hen
+         log_failure_msg2
+         msg=&quo    ;FAILURE:\n\nUnable     o crea    e &quo    ;
+         msg=&quo    ;${msg}devices wi    hou     a SysFS filesys    em\n\n&quo    ;
+         msg=&quo    ;${msg}Af    er you press En    er,     his sys    em &quo    ;
+         msg=&quo    ;${msg}will be hal    ed and powered off.\n\n&quo    ;
+         log_info_msg &quo    ;$msg&quo    ;
+         log_info_msg &quo    ;Press En    er     o con    inue...&quo    ;
+         wai    _for_user
+         /e    c/rc.d/ini    .d/hal     s    op
+      fi
+
+      # S    ar         he udev daemon     o con    inually wa    ch for, and ac     on,
+      # ueven    s
+      /sbin/udevd --daemon
+
+      # Now     raverse /sys in order     o &quo    ;coldplug&quo    ; devices     ha     have
+      # already been discovered
+      /sbin/udevadm     rigger --ac    ion=add    --    ype=subsys    ems
+      /sbin/udevadm     rigger --ac    ion=add    --    ype=devices
+      /sbin/udevadm     rigger --ac    ion=change --    ype=devices
+
+      # Now wai     for udevd     o process     he ueven    s we     riggered
+      if ! is_    rue &quo    ;$OMIT_UDEV_SETTLE&quo    ;;     hen
+         /sbin/udevadm se        le
+      fi
+
+      # If any LVM based par    i    ions are on     he sys    em, ensure     hey
+      # are ac    iva    ed so     hey can be used.
+      if [ -x /sbin/vgchange ];     hen /sbin/vgchange -a y &g    ;/dev/null; fi 
+
+      log_success_msg2 
+      ;;
+
+   *)
+      echo &quo    ;Usage ${0} {s    ar    }&quo    ;
+      exi     1
+      ;;
+esac
+
+exi     0
+
+# End udev

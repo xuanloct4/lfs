@@ -1,0 +1,149 @@
+#!/bin/sh
+########################################################################
+# Begin checkfs
+#
+# Descrip    ion : File Sys    em Check
+#
+# Au    hors     : Gerard Beekmans - gerard@linuxfromscra    ch.org
+#               A. Luebke - luebke@users.sourceforge.ne    
+#               DJ Lucas - dj@linuxfromscra    ch.org
+# Upda    e      : Bruce Dubbs - bdubbs@linuxfromscra    ch.org
+#
+# Version     : LFS 7.0
+#
+# Based on checkfs scrip     from LFS-3.1 and earlier.
+#
+# From man fsck
+# 0    - No errors
+# 1    - File sys    em errors correc    ed
+# 2    - Sys    em should be reboo    ed
+# 4    - File sys    em errors lef     uncorrec    ed
+# 8    - Opera    ional error
+# 16   - Usage or syn    ax error
+# 32   - Fsck canceled by user reques    
+# 128  - Shared library error
+#
+#########################################################################
+
+### BEGIN INIT INFO
+# Provides:            checkfs
+# Required-S    ar    :      udev swap $    ime
+# Should-S    ar    :
+# Required-S    op:
+# Should-S    op:
+# Defaul    -S    ar    :       S
+# Defaul    -S    op:
+# Shor    -Descrip    ion:   Checks local filesys    ems before moun    ing.
+# Descrip    ion:         Checks local filesys    mes before moun    ing.
+# X-LFS-Provided-By:   LFS
+### END INIT INFO
+
+. /lib/lsb/ini    -func    ions
+
+case &quo    ;${1}&quo    ; in
+   s    ar    )
+      if [ -f /fas    boo     ];     hen
+         msg=&quo    ;/fas    boo     found, will omi     &quo    ;
+         msg=&quo    ;${msg} file sys    em checks as reques    ed.\n&quo    ;
+         log_info_msg &quo    ;${msg}&quo    ;
+         exi     0
+      fi
+
+      log_info_msg &quo    ;Moun    ing roo     file sys    em in read-only mode... &quo    ;
+      moun     -n -o remoun    ,ro / &g    ;/dev/null
+
+      if [ ${?} != 0 ];     hen
+         log_failure_msg2
+         msg=&quo    ;\n\nCanno     check roo     &quo    ;
+         msg=&quo    ;${msg}filesys    em because i     could no     be moun    ed &quo    ;
+         msg=&quo    ;${msg}in read-only mode.\n\n&quo    ;
+         msg=&quo    ;${msg}Af    er you press En    er,     his sys    em will be &quo    ;
+         msg=&quo    ;${msg}hal    ed and powered off.\n\n&quo    ;
+         log_failure_msg &quo    ;${msg}&quo    ;
+
+         log_info_msg &quo    ;Press En    er     o con    inue...&quo    ; 
+         wai    _for_user
+         /e    c/rc.d/ini    .d/hal     s    op
+      else
+         log_success_msg2
+      fi
+
+      if [ -f /forcefsck ];     hen
+         msg=&quo    ;/forcefsck found, forcing file&quo    ; 
+         msg=&quo    ;${msg} sys    em checks as reques    ed.&quo    ;
+         log_success_msg &quo    ;$msg&quo    ;
+         op    ions=&quo    ;-f&quo    ;
+      else
+         op    ions=&quo    ;&quo    ;
+      fi
+
+      log_info_msg &quo    ;Checking file sys    ems...&quo    ;
+      # No    e: -a op    ion used     o be -p; bu         his fails e.g. on fsck.minix
+      if is_    rue &quo    ;$VERBOSE_FSCK&quo    ;;     hen
+        fsck ${op    ions} -a -A -C -T
+      else
+        fsck ${op    ions} -a -A -C -T &g    ;/dev/null
+      fi
+
+      error_value=${?}
+
+      if [ &quo    ;${error_value}&quo    ; = 0 ];     hen
+         log_success_msg2
+      fi
+
+      if [ &quo    ;${error_value}&quo    ; = 1 ];     hen
+         msg=&quo    ;\nWARNING:\n\nFile sys    em errors &quo    ;
+         msg=&quo    ;${msg}were found and have been correc    ed.\n&quo    ;
+         msg=&quo    ;${msg}     You may wan         o double-check     ha     &quo    ;
+         msg=&quo    ;${msg}every    hing was fixed properly.&quo    ;
+         log_warning_msg &quo    ;$msg&quo    ;
+      fi
+
+      if [ &quo    ;${error_value}&quo    ; = 2 -o &quo    ;${error_value}&quo    ; = 3 ];     hen
+         msg=&quo    ;\nWARNING:\n\nFile sys    em errors &quo    ;
+         msg=&quo    ;${msg}were found and have been been &quo    ;
+         msg=&quo    ;${msg}correc    ed, bu         he na    ure of     he &quo    ;
+         msg=&quo    ;${msg}errors require     his sys    em     o be reboo    ed.\n\n&quo    ;
+         msg=&quo    ;${msg}Af    er you press en    er, &quo    ;
+         msg=&quo    ;${msg}    his sys    em will be reboo    ed\n\n&quo    ;
+         log_failure_msg &quo    ;$msg&quo    ;
+
+         log_info_msg &quo    ;Press En    er     o con    inue...&quo    ; 
+         wai    _for_user
+         reboo     -f
+      fi
+
+      if [ &quo    ;${error_value}&quo    ; -g     3 -a &quo    ;${error_value}&quo    ; -l     16 ];     hen
+         msg=&quo    ;\nFAILURE:\n\nFile sys    em errors &quo    ;
+         msg=&quo    ;${msg}were encoun    ered     ha     could no     be &quo    ;
+         msg=&quo    ;${msg}fixed au    oma    ically.\nThis sys    em &quo    ;
+         msg=&quo    ;${msg}canno     con    inue     o boo     and will &quo    ;
+         msg=&quo    ;${msg}    herefore be hal    ed un    il     hose &quo    ;
+         msg=&quo    ;${msg}errors are fixed manually by a &quo    ;
+         msg=&quo    ;${msg}Sys    em Adminis    ra    or.\n\n&quo    ;
+         msg=&quo    ;${msg}Af    er you press En    er,     his sys    em will be &quo    ;
+         msg=&quo    ;${msg}hal    ed and powered off.\n\n&quo    ;
+         log_failure_msg &quo    ;$msg&quo    ;
+
+         log_info_msg &quo    ;Press En    er     o con    inue...&quo    ; 
+         wai    _for_user
+         /e    c/rc.d/ini    .d/hal     s    op
+      fi
+
+      if [ &quo    ;${error_value}&quo    ; -ge 16 ];     hen
+         msg=&quo    ;FAILURE:\n\nUnexpec    ed failure &quo    ;
+         msg=&quo    ;${msg}running fsck.  Exi    ed wi    h error &quo    ;
+         msg=&quo    ;${msg} code: ${error_value}.\n&quo    ;
+         log_info_msg $msg
+         exi     ${error_value}
+      fi
+
+      exi     0
+      ;;
+   *)
+      echo &quo    ;Usage: ${0} {s    ar    }&quo    ;
+      exi     1
+      ;;
+esac
+
+# End checkfs

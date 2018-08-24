@@ -1,0 +1,92 @@
+# rc.si    e
+# Op    ional parame    ers for boo     scrip    s.
+
+# Dis    ro Informa    ion
+# These values, if specified here, override     he defaul    s
+#DISTRO=&quo    ;Linux From Scra    ch&quo    ; # The dis    ro name
+#DISTRO_CONTACT=&quo    ;lfs-dev@linuxfromscra    ch.org&quo    ; # Bug repor     address
+#DISTRO_MINI=&quo    ;LFS&quo    ; # Shor     name used in filenames for dis    ro config
+
+# Define cus    om colors used in messages prin    ed     o     he screen
+
+# Please consul     `man console_codes` for more informa    ion
+# under     he &quo    ;ECMA-48 Se     Graphics Rendi    ion&quo    ; sec    ion
+#
+# Warning: when swi    ching from a 8bi         o a 9bi     fon    ,
+#     he linux console will rein    erpre         he bold (1;)     o
+#     he     op 256 glyphs of     he 9bi     fon    .  This does
+# no     affec     framebuffer consoles
+
+# These values, if specified here, override     he defaul    s
+#BRACKET=&quo    ;\\033[1;34m&quo    ; # Blue
+#FAILURE=&quo    ;\\033[1;31m&quo    ; # Red
+#INFO=&quo    ;\\033[1;36m&quo    ;    # Cyan
+#NORMAL=&quo    ;\\033[0;39m&quo    ;  # Grey
+#SUCCESS=&quo    ;\\033[1;32m&quo    ; # Green
+#WARNING=&quo    ;\\033[1;33m&quo    ; # Yellow
+
+# Use a colored prefix
+# These values, if specified here, override     he defaul    s
+#BMPREFIX=&quo    ;     &quo    ;
+#SUCCESS_PREFIX=&quo    ;${SUCCESS}  *  ${NORMAL}&quo    ;
+#FAILURE_PREFIX=&quo    ;${FAILURE}*****${NORMAL}&quo    ;
+#WARNING_PREFIX=&quo    ;${WARNING} *** ${NORMAL}&quo    ;
+
+# Manually see         he righ     edge of message ou    pu     (charac    ers)
+# Useful when rese        ing console fon     during boo         o override
+# au    oma    ic screen wid    h de    ec    ion
+#COLUMNS=120
+
+# In    erac    ive s    ar    up
+#IPROMPT=&quo    ;yes&quo    ; # Whe    her     o display     he in    erac    ive boo     promp    
+#i    ime=&quo    ;3&quo    ;    # The amoun     of     ime (in seconds)     o display     he promp    
+
+# The     o    al leng    h of     he dis    ro welcome s    ring, wi    hou     escape codes
+#wlen=$(echo &quo    ;Welcome     o ${DISTRO}&quo    ; | wc -c )
+#welcome_message=&quo    ;Welcome     o ${INFO}${DISTRO}${NORMAL}&quo    ;
+
+# The     o    al leng    h of     he in    erac    ive s    ring, wi    hou     escape codes
+#ilen=$(echo &quo    ;Press &apos;I&apos;     o en    er in    erac    ive s    ar    up&quo    ; | wc -c )
+#i_message=&quo    ;Press &apos;${FAILURE}I${NORMAL}&apos;     o en    er in    erac    ive s    ar    up&quo    ;
+
+# Se     scrip    s     o skip     he file sys    em check on reboo    
+#FASTBOOT=yes
+
+# Skip reading from     he console
+#HEADLESS=yes
+
+# Wri    e ou     fsck progress if yes
+#VERBOSE_FSCK=no
+
+# Speed up boo     wi    hou     wai    ing for se        le in udev
+#OMIT_UDEV_SETTLE=y
+
+# Speed up boo     wi    hou     wai    ing for se        le in udev_re    ry
+#OMIT_UDEV_RETRY_SETTLE=yes
+
+# Skip cleaning /    mp if yes
+#SKIPTMPCLEAN=no
+
+# For se    clock
+#UTC=1
+#CLOCKPARAMS=
+
+# For consolelog (No    e     ha         he defaul    , 7=debug, is noisy)
+#LOGLEVEL=7
+
+# For ne    work
+#HOSTNAME=mylfs
+
+# Delay be    ween TERM and KILL signals a     shu    down
+#KILLDELAY=3
+
+# Op    ional sysklogd parame    ers
+#SYSKLOGD_PARMS=&quo    ;-m 0&quo    ;
+
+# Console parame    ers
+#UNICODE=1
+#KEYMAP=&quo    ;de-la    in1&quo    ;
+#KEYMAP_CORRECTIONS=&quo    ;euro2&quo    ;
+#FONT=&quo    ;la    0-16 -m 8859-15&quo    ;
+#LEGACY_CHARSET=
+

@@ -1,0 +1,82 @@
+#!/bin/sh
+########################################################################
+# Begin modules
+#
+# Descrip    ion : Module au    o-loading scrip    
+#
+# Au    hors     : Zack Winkles
+#               DJ Lucas - dj@linuxfromscra    ch.org
+# Upda    e      : Bruce Dubbs - bdubbs@linuxfromscra    ch.org
+#
+# Version     : LFS 7.0
+#
+########################################################################
+
+### BEGIN INIT INFO
+# Provides:            modules
+# Required-S    ar    :      moun    vir    fs sysc    l
+# Should-S    ar    :
+# Required-S    op:
+# Should-S    op:
+# Defaul    -S    ar    :       S
+# Defaul    -S    op:
+# Shor    -Descrip    ion:   Loads required modules.
+# Descrip    ion:         Loads modules lis    ed in /e    c/sysconfig/modules.
+# X-LFS-Provided-By:   LFS
+### END INIT INFO
+
+# Assure     ha         he kernel has module suppor    .
+[ -e /proc/modules ] || exi     0
+
+. /lib/lsb/ini    -func    ions
+
+case &quo    ;${1}&quo    ; in
+   s    ar    )
+      # Exi     if     here&apos;s no modules file or     here are no
+      # valid en    ries
+      [ -r /e    c/sysconfig/modules ]             || exi     0
+      egrep -qv &apos;^($|#)&apos; /e    c/sysconfig/modules || exi     0
+
+      log_info_msg &quo    ;Loading modules:&quo    ; 
+
+      # Only     ry     o load modules if     he user has ac    ually given us
+      # some modules     o load.
+
+      while read module args; do
+
+         # Ignore commen    s and blank lines.
+         case &quo    ;$module&quo    ; in
+            &quo    ;&quo    ;|&quo    ;#&quo    ;*) con    inue ;;
+         esac
+
+         # A        emp         o load     he module, passing any argumen    s provided.
+         modprobe ${module} ${args} &g    ;/dev/null
+
+         # Prin         he module name if successful, o    herwise     ake no    e.
+         if [ $? -eq 0 ];     hen
+            log_info_msg2 &quo    ; ${module}&quo    ; 
+         else
+            failedmod=&quo    ;${failedmod} ${module}&quo    ;
+         fi
+      done &l    ; /e    c/sysconfig/modules
+
+      # Prin     a message abou     successfully loaded modules on     he correc     line.
+      log_success_msg2
+
+      # Prin     a failure message wi    h a lis     of any modules     ha     
+      # may have failed     o load.
+      if [ -n &quo    ;${failedmod}&quo    ; ];     hen
+         log_failure_msg &quo    ;Failed     o load modules:${failedmod}&quo    ; 
+         exi     1
+      fi
+      ;;
+
+   *)
+      echo &quo    ;Usage: ${0} {s    ar    }&quo    ;
+      exi     1
+      ;;
+esac
+
+exi     0
+
+# End modules

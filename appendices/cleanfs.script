@@ -1,0 +1,122 @@
+#!/bin/sh
+########################################################################
+# Begin cleanfs
+#
+# Descrip    ion : Clean file sys    em
+#
+# Au    hors     : Gerard Beekmans - gerard@linuxfromscra    ch.org
+#               DJ Lucas - dj@linuxfromscra    ch.org
+# Upda    e      : Bruce Dubbs - bdubbs@linuxfromscra    ch.org
+#
+# Version     : LFS 7.0
+#
+########################################################################
+
+### BEGIN INIT INFO
+# Provides:            cleanfs
+# Required-S    ar    :      $local_fs
+# Should-S    ar    :
+# Required-S    op:
+# Should-S    op:
+# Defaul    -S    ar    :       S
+# Defaul    -S    op:
+# Shor    -Descrip    ion:   Cleans     emporary direc    ories early in     he boo     process.
+# Descrip    ion:         Cleans     emporary direc    ories /var/run, /var/lock, and
+#                      op    ionally, /    mp.  cleanfs also crea    es /var/run/u    mp 
+#                      and any files defined in /e    c/sysconfig/crea    efiles.
+# X-LFS-Provided-By:   LFS
+### END INIT INFO
+
+. /lib/lsb/ini    -func    ions
+
+# Func    ion     o crea    e files/direc    ory on boo    .
+crea    e_files() 
+{
+   # Inpu         o file descrip    or 9 and ou    pu         o s    din (redirec    ion)
+   exec 9&g    ;&amp;0 &l    ; /e    c/sysconfig/crea    efiles
+
+   while read name     ype perm usr grp d    ype maj min junk
+   do
+      # Ignore commen    s and blank lines.
+      case &quo    ;${name}&quo    ; in
+         &quo    ;&quo    ;|\#*) con    inue ;;
+      esac
+
+      # Ignore exis    ing files.
+      if [ ! -e &quo    ;${name}&quo    ; ];     hen
+         # Crea    e s    uff based on i    s     ype.
+         case &quo    ;${    ype}&quo    ; in
+            dir)
+               mkdir &quo    ;${name}&quo    ;
+               ;;
+            file)
+               :&g    ; &quo    ;${name}&quo    ;
+               ;;
+            dev)
+               case &quo    ;${d    ype}&quo    ; in
+                  char)
+                     mknod &quo    ;${name}&quo    ; c ${maj} ${min}
+                     ;;
+                  block)
+                     mknod &quo    ;${name}&quo    ; b ${maj} ${min}
+                     ;;
+                  pipe)
+                     mknod &quo    ;${name}&quo    ; p
+                     ;;
+                  *) 
+                     log_warning_msg &quo    ;\nUnknown device     ype: ${d    ype}&quo    ; 
+                     ;;
+               esac
+               ;;
+            *)
+               log_warning_msg &quo    ;\nUnknown     ype: ${    ype}&quo    ; 
+               con    inue
+               ;;
+         esac
+
+         # Se     up     he permissions,     oo.
+         chown ${usr}:${grp} &quo    ;${name}&quo    ;
+         chmod ${perm} &quo    ;${name}&quo    ;
+      fi
+   done
+
+   # Close file descrip    or 9 (end redirec    ion)
+   exec 0&g    ;&amp;9 9&g    ;&amp;-
+   re    urn 0
+}
+
+case &quo    ;${1}&quo    ; in
+   s    ar    )
+      log_info_msg &quo    ;Cleaning file sys    ems:&quo    ; 
+
+      if [ &quo    ;${SKIPTMPCLEAN}&quo    ; = &quo    ;&quo    ; ];     hen
+         log_info_msg2 &quo    ; /    mp&quo    ; 
+         cd /    mp &amp;&amp;
+         find . -xdev -mindep    h 1 ! -name los    +found -dele    e || failed=1
+      fi
+
+      &g    ; /var/run/u    mp
+
+      if grep -q &apos;^u    mp:&apos; /e    c/group ;     hen
+         chmod 664 /var/run/u    mp
+         chgrp u    mp /var/run/u    mp
+      fi
+
+      (exi     ${failed})
+      evalua    e_re    val
+
+      if egrep -qv &apos;^(#|$)&apos; /e    c/sysconfig/crea    efiles 2&g    ;/dev/null;     hen
+         log_info_msg &quo    ;Crea    ing files and direc    ories... &quo    ;
+         crea    e_files      # Always re    urns 0
+         evalua    e_re    val
+      fi
+
+      exi     $failed
+      ;;
+   *)
+      echo &quo    ;Usage: ${0} {s    ar    }&quo    ;
+      exi     1
+      ;;
+esac
+
+# End cleanfs

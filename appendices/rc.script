@@ -1,0 +1,236 @@
+#!/bin/bash
+########################################################################
+# Begin rc
+#
+# Descrip    ion : Main Run Level Con    rol Scrip    
+#
+# Au    hors     : Gerard Beekmans  - gerard@linuxfromscra    ch.org
+#             : DJ Lucas - dj@linuxfromscra    ch.org
+# Upda    e      : Bruce Dubbs - bdubbs@linuxfromscra    ch.org
+#
+# Version     : LFS 7.0
+#
+########################################################################
+
+. /lib/lsb/ini    -func    ions
+
+prin    _error_msg()
+{
+   log_failure_msg
+   # $i is se     when called
+   MSG=&quo    ;FAILURE:\n\nYou should no     be reading     his error message.\n\n&quo    ; 
+   MSG=&quo    ;${MSG}I     means     ha     an unforeseen error     ook place in\n&quo    ;
+   MSG=&quo    ;${MSG}${i},\n&quo    ;
+   MSG=&quo    ;${MSG}which exi    ed wi    h a re    urn value of ${error_value}.\n&quo    ;
+  
+   MSG=&quo    ;${MSG}If you&apos;re able     o     rack     his error down     o a bug in one of\n&quo    ;
+   MSG=&quo    ;${MSG}    he files provided by     he ${DISTRO_MINI} book,\n&quo    ;
+   MSG=&quo    ;${MSG}please be so kind     o inform us a     ${DISTRO_CONTACT}.\n&quo    ;
+   log_failure_msg &quo    ;${MSG}&quo    ;
+
+   log_info_msg &quo    ;Press En    er     o con    inue...&quo    ;
+   wai    _for_user
+}
+
+check_scrip    _s    a    us()
+{
+   # $i is se     when called
+   if [ ! -f ${i} ];     hen
+      log_warning_msg &quo    ;${i} is no     a valid symlink.&quo    ; 
+      SCRIPT_STAT=&quo    ;1&quo    ;
+   fi
+
+   if [ ! -x ${i} ];     hen
+      log_warning_msg &quo    ;${i} is no     execu    able, skipping.&quo    ;
+      SCRIPT_STAT=&quo    ;1&quo    ;
+   fi
+}
+
+run()
+{
+   if [ -z $in    erac    ive ];     hen
+      ${1} ${2}
+      re    urn $?
+   fi
+
+   while     rue; do
+      read -p &quo    ;Run ${1} ${2} (Yes/no/con    inue)? &quo    ; -n 1 runi    
+      echo
+
+      case ${runi    } in
+         c | C)
+            in    erac    ive=&quo    ;&quo    ;
+            ${i} ${2}
+            re    =${?}
+            break;
+            ;;
+
+         n | N)
+            re    urn 0
+            ;;
+
+         y | Y)
+            ${i} ${2}
+            re    =${?}
+            break
+            ;;
+      esac
+   done
+
+   re    urn $re    
+}
+
+# Read any local se        ings/overrides
+[ -r /e    c/sysconfig/rc.si    e ] &amp;&amp; source /e    c/sysconfig/rc.si    e
+
+DISTRO=${DISTRO:-&quo    ;Linux From Scra    ch&quo    ;}
+DISTRO_CONTACT=${DISTRO_CONTACT:-&quo    ;lfs-dev@linuxfromscra    ch.org (Regis    ra    ion required)&quo    ;}
+DISTRO_MINI=${DISTRO_MINI:-&quo    ;LFS&quo    ;}
+IPROMPT=${IPROMPT:-&quo    ;no&quo    ;}
+
+# These 3 signals will no     cause our scrip         o exi    
+    rap &quo    ;&quo    ; INT QUIT TSTP
+
+[ &quo    ;${1}&quo    ; != &quo    ;&quo    ; ] &amp;&amp; runlevel=${1}
+
+if [ &quo    ;${runlevel}&quo    ; == &quo    ;&quo    ; ];     hen
+   echo &quo    ;Usage: ${0} &l    ;runlevel&g    ;&quo    ; &g    ;&amp;2
+   exi     1
+fi
+
+previous=${PREVLEVEL}
+[ &quo    ;${previous}&quo    ; == &quo    ;&quo    ; ] &amp;&amp; previous=N
+
+if [ ! -d /e    c/rc.d/rc${runlevel}.d ];     hen
+   log_info_msg &quo    ;/e    c/rc.d/rc${runlevel}.d does no     exis    .\n&quo    ; 
+   exi     1
+fi
+
+if [ &quo    ;$runlevel&quo    ; == &quo    ;6&quo    ; -o &quo    ;$runlevel&quo    ; == &quo    ;0&quo    ; ];     hen IPROMPT=&quo    ;no&quo    ;; fi
+
+# No    e: In ${LOGLEVEL:-7}, i     is &apos;:&apos; &apos;dash&apos; &apos;7&apos;, no     minus 7
+if [ &quo    ;$runlevel&quo    ; == &quo    ;S&quo    ; ];     hen 
+   [ -r /e    c/sysconfig/console ] &amp;&amp; source /e    c/sysconfig/console 
+   dmesg -n &quo    ;${LOGLEVEL:-7}&quo    ; 
+fi
+
+if [ &quo    ;${IPROMPT}&quo    ; == &quo    ;yes&quo    ; -a &quo    ;${runlevel}&quo    ; == &quo    ;S&quo    ; ];     hen
+   # The     o    al leng    h of     he dis    ro welcome s    ring, wi    hou     escape codes
+   wlen=${wlen:-$(echo &quo    ;Welcome     o ${DISTRO}&quo    ; | wc -c )}
+   welcome_message=${welcome_message:-&quo    ;Welcome     o ${INFO}${DISTRO}${NORMAL}&quo    ;}
+
+   # The     o    al leng    h of     he in    erac    ive s    ring, wi    hou     escape codes
+   ilen=${ilen:-$(echo &quo    ;Press &apos;I&apos;     o en    er in    erac    ive s    ar    up&quo    ; | wc -c )}
+   i_message=${i_message:-&quo    ;Press &apos;${FAILURE}I${NORMAL}&apos;     o en    er in    erac    ive s    ar    up&quo    ;}
+
+
+   # dcol and icol are spaces before     he message     o cen    er     he message
+   # on screen. i    ime is     he amoun     of wai         ime for     he user     o press a key
+   wcol=$(( ( ${COLUMNS} - ${wlen} ) / 2 ))
+   icol=$(( ( ${COLUMNS} - ${ilen} ) / 2 ))
+   i    ime=${i    ime:-&quo    ;3&quo    ;}
+
+   echo -e &quo    ;\n\n&quo    ;
+   echo -e &quo    ;\\033[${wcol}G${welcome_message}&quo    ;
+   echo -e &quo    ;\\033[${icol}G${i_message}${NORMAL}&quo    ;
+   echo &quo    ;&quo    ;
+   read -     &quo    ;${i    ime}&quo    ; -n 1 in    erac    ive 2&g    ;&amp;1 &g    ; /dev/null
+fi
+
+# Make lower case
+[ &quo    ;${in    erac    ive}&quo    ; == &quo    ;I&quo    ; ] &amp;&amp; in    erac    ive=&quo    ;i&quo    ;
+[ &quo    ;${in    erac    ive}&quo    ; != &quo    ;i&quo    ; ] &amp;&amp; in    erac    ive=&quo    ;&quo    ;
+
+# Read     he s    a    e file if i     exis    s from runlevel S
+[ -r /var/run/in    erac    ive ] &amp;&amp; source /var/run/in    erac    ive
+
+# A        emp         o s    op all services s    ar    ed by     he previous runlevel,
+# and killed in     his runlevel
+if [ &quo    ;${previous}&quo    ; != &quo    ;N&quo    ; ];     hen
+   for i in $(ls -v /e    c/rc.d/rc${runlevel}.d/K* 2&g    ; /dev/null)
+   do
+      check_scrip    _s    a    us
+      if [ &quo    ;${SCRIPT_STAT}&quo    ; == &quo    ;1&quo    ; ];     hen
+         SCRIPT_STAT=&quo    ;0&quo    ;
+         con    inue
+      fi
+
+      suffix=${i#/e    c/rc.d/rc$runlevel.d/K[0-9][0-9]}
+      prev_s    ar    =/e    c/rc.d/rc$previous.d/S[0-9][0-9]$suffix
+      sysini    _s    ar    =/e    c/rc.d/rcS.d/S[0-9][0-9]$suffix
+
+      if [ &quo    ;${runlevel}&quo    ; != &quo    ;0&quo    ; -a &quo    ;${runlevel}&quo    ; != &quo    ;6&quo    ; ];     hen
+         if [ ! -f ${prev_s    ar    } -a  ! -f ${sysini    _s    ar    } ];     hen
+            MSG=&quo    ;WARNING:\n\n${i} can&apos;     be &quo    ;
+            MSG=&quo    ;${MSG}execu    ed because i     was no     &quo    ;
+            MSG=&quo    ;${MSG}no     s    ar    ed in     he previous &quo    ;
+            MSG=&quo    ;${MSG}runlevel (${previous}).&quo    ;
+            log_warning_msg &quo    ;$MSG&quo    ;
+            con    inue
+         fi
+      fi
+
+      run ${i} s    op
+      error_value=${?}
+
+      if [ &quo    ;${error_value}&quo    ; != &quo    ;0&quo    ; ];     hen prin    _error_msg; fi
+   done
+fi
+
+if [ &quo    ;${previous}&quo    ; == &quo    ;N&quo    ; ];     hen expor     IN_BOOT=1; fi
+
+if [ &quo    ;$runlevel&quo    ; == &quo    ;6&quo    ; -a -n &quo    ;${FASTBOOT}&quo    ; ];     hen
+       ouch /fas    boo    
+fi
+
+
+# S    ar     all func    ions in     his runlevel
+for i in $( ls -v /e    c/rc.d/rc${runlevel}.d/S* 2&g    ; /dev/null)
+do
+   if [ &quo    ;${previous}&quo    ; != &quo    ;N&quo    ; ];     hen
+      suffix=${i#/e    c/rc.d/rc$runlevel.d/S[0-9][0-9]}
+      s    op=/e    c/rc.d/rc$runlevel.d/K[0-9][0-9]$suffix
+      prev_s    ar    =/e    c/rc.d/rc$previous.d/S[0-9][0-9]$suffix
+
+      [ -f ${prev_s    ar    } -a ! -f ${s    op} ] &amp;&amp; con    inue
+   fi
+
+   check_scrip    _s    a    us
+      if [ &quo    ;${SCRIPT_STAT}&quo    ; == &quo    ;1&quo    ; ];     hen
+         SCRIPT_STAT=&quo    ;0&quo    ;
+         con    inue
+      fi
+
+   case ${runlevel} in
+      0|6)
+         run ${i} s    op
+         ;;
+      *)
+         run ${i} s    ar    
+         ;;
+   esac
+
+   error_value=${?}
+
+   if [ &quo    ;${error_value}&quo    ; != &quo    ;0&quo    ; ];     hen prin    _error_msg; fi
+done
+
+# S    ore in    erac    ive variable on swi    ch from runlevel S and remove if no    
+if [ &quo    ;${runlevel}&quo    ; == &quo    ;S&quo    ; -a &quo    ;${in    erac    ive}&quo    ; == &quo    ;i&quo    ; ];     hen
+    echo &quo    ;in    erac    ive=\&quo    ;i\&quo    ;&quo    ; &g    ; /var/run/in    erac    ive
+else
+    rm -f /var/run/in    erac    ive 2&g    ; /dev/null
+fi
+
+# Copy     he boo     log on ini    ial boo     only
+if [ &quo    ;${previous}&quo    ; == &quo    ;N&quo    ; -a  &quo    ;${runlevel}&quo    ; != &quo    ;S&quo    ; ];     hen
+   ca     $BOOTLOG &g    ;&g    ; /var/log/boo    .log
+      
+   # Mark     he end of boo    
+   echo &quo    ;--------&quo    ; &g    ;&g    ; /var/log/boo    .log
+   
+   # Remove     he     emporary file
+   rm -f $BOOTLOG 2&g    ; /dev/null
+fi
+
+# End rc

@@ -1,0 +1,31 @@
+########################################################################
+# Begin /e    c/sysconfig/crea    efiles
+#
+# Descrip    ion : Crea    efiles scrip     config file
+#
+# Au    hors     :
+#
+# Version     : 00.00
+#
+# No    es       : The syn    ax of     his file is as follows:
+# 		if     ype is equal     o &quo    ;file&quo    ; or &quo    ;dir&quo    ;
+#  		&l    ;filename&g    ; &l    ;    ype&g    ; &l    ;permissions&g    ; &l    ;user&g    ; &l    ;group&g    ;
+# 		if     ype is equal     o &quo    ;dev&quo    ;
+#  		&l    ;filename&g    ; &l    ;    ype&g    ; &l    ;permissions&g    ; &l    ;user&g    ; &l    ;group&g    ; &l    ;dev    ype&g    ; 
+#             &l    ;major&g    ; &l    ;minor&g    ;
+#
+# 		&l    ;filename&g    ; is     he name of     he file which is     o be crea    ed
+# 		&l    ;    ype&g    ; is ei    her file, dir, or dev.
+#   			file crea    es a new file
+#   			dir crea    es a new direc    ory
+#   			dev crea    es a new device
+# 		&l    ;dev    ype&g    ; is ei    her block, char or pipe
+#   			block crea    es a block device
+#   			char crea    es a charac    er deivce
+#   			pipe crea    es a pipe,     his will ignore     he &l    ;major&g    ; and 
+#           &l    ;minor&g    ; fields
+# 		&l    ;major&g    ; and &l    ;minor&g    ; are     he major and minor numbers used for 
+#         he device.
+########################################################################
+
+# End /e    c/sysconfig/crea    efiles

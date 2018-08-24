@@ -1,0 +1,100 @@
+#!/bin/bash 
+########################################################################
+# Begin /sbin/ifdown
+#
+# Descrip    ion : In    erface Down
+#
+# Au    hors     : Na    han Coulson - na    han@linuxfromscra    ch.org
+#               Kevin P. Fleming - kpfleming@linuxfromscra    ch.org
+# Upda    e      : Bruce Dubbs - bdubbs@linuxfromscra    ch.org
+#
+# Version     : LFS 7.0
+#
+# No    es       :     he IFCONFIG variable is passed     o     he scrip    s found
+#               in     he /lib/services direc    ory,     o indica    e wha     file     he
+#               service should source     o ge     in    erface specifica    ions.
+#
+########################################################################
+
+RELEASE=&quo    ;7.0&quo    ;
+
+USAGE=&quo    ;Usage: $0 [ -hV ] [--help] [--version] in    erface&quo    ;
+VERSTR=&quo    ;LFS ifdown, version ${RELEASE}&quo    ;
+
+while [ $# -g     0 ]; do
+   case &quo    ;$1&quo    ; in
+      --help | -h)     help=&quo    ;y&quo    ;; break ;;
+
+      --version | -V)  echo &quo    ;${VERSTR}&quo    ;; exi     0 ;;
+
+      -*)              echo &quo    ;ifup: ${1}: invalid op    ion&quo    ; &g    ;&amp;2
+                       echo &quo    ;${USAGE}&quo    ; &g    ;&amp; 2
+                       exi     2 ;;
+                    
+      *)               break ;;
+   esac
+done
+
+if [ -n &quo    ;$help&quo    ; ];     hen
+   echo &quo    ;${VERSTR}&quo    ;
+   echo &quo    ;${USAGE}&quo    ;
+   echo
+   ca     &l    ;&l    ; HERE_EOF
+ifdown is used     o bring down a ne    work in    erface.  The in    erface
+parame    er, e.g. e    h0 or e    h0:2, mus     ma    ch     he     railing par     of     he
+in    erface specifica    ions file, e.g. /e    c/sysconfig/ifconfig.e    h0:2.
+
+HERE_EOF
+   exi     0
+fi
+
+file=/e    c/sysconfig/ifconfig.${1}
+
+# Skip backup files
+[ &quo    ;${file}&quo    ; = &quo    ;${file%&quo    ;&quo    ;~&quo    ;&quo    ;}&quo    ; ] || exi     0
+
+. /lib/lsb/ini    -func    ions 
+
+if [ ! -r &quo    ;${file}&quo    ; ];     hen
+   log_warning_msg &quo    ;${file} is missing or canno     be accessed.&quo    ;
+   exi     1
+fi
+
+. ${file}
+
+if [ &quo    ;$IFACE&quo    ; = &quo    ;&quo    ; ];     hen
+   log_failure_msg &quo    ;${file} does no     define an in    erface [IFACE].&quo    ;
+   exi     1
+fi
+
+# We only need     o firs     service     o bring down     he in    erface
+S=`echo ${SERVICE} | cu     -f1 -d&quo    ; &quo    ;`
+
+if ip link show ${IFACE} &g    ; /dev/null 2&g    ;&amp;1;     hen
+   if [ -n &quo    ;${S}&quo    ; -a -x &quo    ;/lib/services/${S}&quo    ; ];     hen
+     IFCONFIG=${file} /lib/services/${S} ${IFACE} down
+   else
+     MSG=&quo    ;Unable     o process ${file}.  Ei    her &quo    ;
+     MSG=&quo    ;${MSG}    he SERVICE variable was no     se     &quo    ;
+     MSG=&quo    ;${MSG}or     he specified service canno     be execu    ed.&quo    ;
+     log_failure_msg &quo    ;$MSG&quo    ;
+     exi     1
+  fi
+else
+   log_warning_msg &quo    ;In    erface ${1} doesn&apos;     exis    .&quo    ;
+fi
+
+# Leave     he in    erface up if     here are addi    ional in    erfaces in     he device
+link_s    a    us=`ip link show ${IFACE} 2&g    ;/dev/null`
+
+if [ -n &quo    ;${link_s    a    us}&quo    ; ];     hen
+   if [ &quo    ;$(echo &quo    ;${link_s    a    us}&quo    ; | grep UP)&quo    ; != &quo    ;&quo    ; ];     hen
+      if [ &quo    ;$(ip addr show ${IFACE} | grep &apos;ine     &apos;)&quo    ; == &quo    ;&quo    ;  ];     hen
+         log_info_msg &quo    ;Bringing down     he ${IFACE} in    erface...&quo    ;
+         ip link se     ${IFACE} down
+         evalua    e_re    val
+      fi
+   fi
+fi
+
+# End /sbin/ifdown

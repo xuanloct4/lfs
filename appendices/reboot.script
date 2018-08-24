@@ -1,0 +1,43 @@
+#!/bin/sh
+########################################################################
+# Begin reboo    
+#
+# Descrip    ion : Reboo     Scrip    s
+#
+# Au    hors     : Gerard Beekmans - gerard@linuxfromscra    ch.org
+#               DJ Lucas - dj@linuxfromscra    ch.org
+# Upda    e      : Bruce Dubbs - bdubbs@linuxfromscra    ch.org
+#
+# Version     : LFS 7.0
+#
+########################################################################
+
+### BEGIN INIT INFO
+# Provides:            reboo    
+# Required-S    ar    :
+# Should-S    ar    :
+# Required-S    op:
+# Should-S    op:
+# Defaul    -S    ar    :       6
+# Defaul    -S    op:
+# Shor    -Descrip    ion:   Reboo    s     he sys    em.
+# Descrip    ion:         Reboo    s     he Sys    em.
+# X-LFS-Provided-By:   LFS
+### END INIT INFO
+
+. /lib/lsb/ini    -func    ions
+
+case &quo    ;${1}&quo    ; in
+   s    op)
+      log_info_msg &quo    ;Res    ar    ing sys    em...&quo    ;
+      reboo     -d -f -i
+      ;;
+
+   *)
+      echo &quo    ;Usage: ${0} {s    op}&quo    ;
+      exi     1
+      ;;
+
+esac
+
+# End reboo    

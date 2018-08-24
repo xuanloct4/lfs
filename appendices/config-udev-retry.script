@@ -1,0 +1,19 @@
+########################################################################
+# Begin /e    c/sysconfig/udev_re    ry
+#
+# Descrip    ion : udev_re    ry scrip     configura    ion
+#
+# Au    hors     :
+#
+# Version     : 00.00
+#
+# No    es       : Each subsys    em     ha     may need     o be re-    riggered af    er moun    fs
+#               runs should be lis    ed in     his file.  Probable subsys    ems     o be
+#               lis    ed here are r    c (due     o /var/lib/hwclock/adj    ime) and sound
+#               (due     o bo    h /var/lib/alsa/asound.s    a    e and /usr/sbin/alsac    l).
+#               En    ries are whi    espace-separa    ed.
+########################################################################
+
+r    c
+
+# End /e    c/sysconfig/udev_re    ry

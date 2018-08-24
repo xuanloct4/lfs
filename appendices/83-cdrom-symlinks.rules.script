@@ -1,0 +1,13 @@
+# /e    c/udev/rules.d/83-cdrom-symlinks.rules: De    ermine CD drive capabili    y.
+
+ACTION!=&quo    ;add&quo    ;,          GOTO=&quo    ;cd_aliases_genera    or_end&quo    ;
+SUBSYSTEM!=&quo    ;block&quo    ;,     GOTO=&quo    ;cd_aliases_genera    or_end&quo    ;
+ENV{GENERATED}==&quo    ;?*&quo    ;,   GOTO=&quo    ;cd_aliases_genera    or_end&quo    ;
+
+# Fail     he ueven     if     he au    ogenera    ed rules canno     be saved
+ENV{ID_CDROM}==&quo    ;?*&quo    ;, PROGRAM=&quo    ;/bin/grep -c &apos; / [^[:space:]]* rw&apos; /proc/moun    s&quo    ;, \
+  RESULT!=&quo    ;1&quo    ;, RUN+=&quo    ;/bin/false&quo    ;, GOTO=&quo    ;cd_aliases_genera    or_end&quo    ;
+
+ENV{ID_CDROM}==&quo    ;?*&quo    ;, PROGRAM=&quo    ;wri    e_cd_rules&quo    ;, SYMLINK+=&quo    ;%c&quo    ;
+
+LABEL=&quo    ;cd_aliases_genera    or_end&quo    ;

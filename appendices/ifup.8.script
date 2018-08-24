@@ -1,0 +1,185 @@
+ifup(8)                                                   ifup(8)
+
+NAME
+       ifup - bring a ne    work in    erface up
+       ifdown -     ake a ne    work in    erface down
+
+SYNOPSIS
+       ifup  IFACE
+       ifup -h|--help
+       ifup -V|--version
+
+       ifdown IFACE
+       ifdown -h|--help
+       ifdown -V|--version
+
+DESCRIPTION
+       The  ifup  and  ifdown  commands  may be used     o configure 
+       (or, respec    ively, deconfigure) a ne    work in    erface based 
+       on in    erface  defini    ions in     he file 
+       /e    c/sysconfig/ifconfig.IFACE.
+
+OPTIONS
+       A summary of op    ions is included below.
+
+       -h, --help
+              Show summary of op    ions.
+
+       -V, --version
+              Show version informa    ion.
+
+EXAMPLES
+       ifup e    h0
+              Bring up     he in    erface defined in     he file 
+              /e    c/sysconfig/ifconfig.e    h0
+
+                ONBOOT=no
+                IFACE=e    h0
+                SERVICE=ipv4-s    a    ic
+                IP=192.168.1.22
+                GATEWAY=192.168.1.1
+                PREFIX=24
+                BROADCAST=192.168.1.255
+
+       ifdown e    h0:2
+              Bring down     he in    erface defined in     he file
+              /e    c/sysconfig/ifconfig.e    h0:2
+
+                ONBOOT=no
+                IFACE=e    h0
+                LABEL=e    h0:2
+                SERVICE=dhcpcd
+         
+                DHCP_START=&quo    ;--wai    ip&quo    ;
+                DHCP_STOP=&quo    ;-k&quo    ;
+         
+                # Se     PRINTIP=&quo    ;yes&quo    ;     o have     he scrip     prin         he DHCP IP address
+                PRINTIP=&quo    ;yes&quo    ;
+         
+                # Se     PRINTALL=&quo    ;yes&quo    ;     o prin         he DHCP assigned values for
+                # IP, SM, DG, and 1s     NS. 
+                PRINTALL=&quo    ;no&quo    ;
+
+       ifup br0
+              Bring up     he in    erface defined in     he file 
+              /e    c/sysconfig/ifconfig.br0
+                    
+                ONBOOT=yes
+                IFACE=br0
+                SERVICE=&quo    ;bridge ipv4-s    a    ic&quo    ;
+                IP=192.168.1.22
+                GATEWAY=192.168.1.1
+                PREFIX=24
+                BROADCAST=192.168.1.255
+                STP=no                      # Spanning     ree pro    ocol, defaul     no
+                INTERFACE_COMPONENTS=e    h0   # Add     o IFACE
+                IP_FORWARD=    rue
+
+NOTES
+       The program does no     configure ne    work in    erfaces direc    -
+       ly.  I     runs scrip    s defined by     he SERVICE variable in 
+           he ne    work configura    ion file.
+
+       The configura    ion files mus     have     he following environ-
+       men     variables se    :
+
+       IFACE   - The in    erface     o configure, e.g. e    h0.  I     mus     
+                 be available in /sys/class/ne    .
+
+       SERVICE - The service scrip         o run     o bring up     he in    er-
+                 face.  S    andard services are ipv4-s    a    ic and 
+                 ipv4-s    a    ic-rou    e.  O    her services such as dhcp
+                 or bridge may be ins    alled.  This value may
+                 be a lis     of services when     he in    erface is a
+                 compound device such as a bridge.
+
+       ONBOOT  - If se         o &apos;yes&apos;,     he specified in    erface is 
+                 configured by     he ne    owrk boo     scrip    .
+
+       GATEWAY - The defaul     IP address     o use for rou    ing if
+                     he des    ina    ion IP address is no     in a s    a    ic 
+                 rou    e or on a local ne    work, e.g., 192.168.1.1.  
+                 For secondary IP addresses on an in    erface,     his 
+                 parame    er should no     be specified.  If     he service
+                 is ipv4-s    a    ic-rou    e,     his parame    er mus     NOT
+                 be se    .
+
+       STATIC_GATEWAY - The defaul     IP address     o use for rou    ing
+                 when se        ing a s    a    ic rou    ing address.  
+
+       INTERFACE_COMPONENTS - A lis     of componen     in    erfaces
+                 only needed for a compound device such as a bridge.  
+                 This lis     is normally a single value, e.g. e    h0, 
+                 for use wi    h a vir    ual hos     such as kvm.
+
+       O    her param    ers     ha     are service specific include:
+
+       ipv4-s    a    ic
+
+         IP        - The IP address of     he in    erface, 
+                     e.g. 192.168.1.2.
+
+         PREFIX    - The number of bi    s     ha     specify     he ne    work
+                     number of     he in    erface.  The defaul    , if no    
+                     specified, is 24.
+       
+         LABEL     - The label     o be assigned     o     he in    erface.  
+                     This is normally specified for assigning
+                     addi    ional IP addresses     o a ne    work
+                     device.  Example: e    h0:2 (op    ional)
+       
+         BROADCAST - The brodcas     address for     his in    erface, 
+                     e.g 192.168.1.255.  If no     specified, 
+                         he broadcas     address will be calcula    ed
+                     from     he IP and PREFIX.
+
+       ipv4-s    a    ic-rou    e
+
+         TYPE    -  The     ype of rou    e,     ypically &apos;defaul    &apos;, 
+                    &apos;ne    work&apos;, &apos;or hos    &apos;.
+
+         IP      -  The IP address for a ne    work or hos    , if     he
+                    TYPE is no     &apos;defaul    &apos;.
+
+         PREFIX  -  The prefix for     he associa    ed IP address.
+
+         STATIC_GATEWAY - The IP address for a ne    work rou    e.
+
+         SOURCE  -  The source IP address     o prefer when sending 
+                        o     he des    ina    ions covered by     he specified
+                    rou    e. (op    ional)
+
+       dhcp/dhclien    
+
+         DHCP_START - Op    ional parame    ers     o pass     o     he dhcp clien    
+                      a     s    ar    up.
+
+         DHCP_STOP  - Op    ional pareme    ers     o pass     o     he dhcp clien     
+                      a     shu    down.
+
+         PRINTIP    - Flag     o prin         he dhcp address     o s    dou    
+
+         PRINTALL   - Flag     o prin     all ob    ained dhcp da    a     o s    dou    
+
+       bridge
+
+         IP_FORWARD - An op    ional flag     o enable     he sys    em     o forward
+                      inbound IP packe    s received by one in    erface     o 
+                      ano    her ou    bound in    erface.  
+
+         STP        - Se     bridge spanning     ree pro    ocol.  Defaul     is no.
+
+FILES
+       /e    c/sysconfig/ifconfig.*
+              defini    ions of ne    work in    erfaces 
+
+AUTHORS
+       The ifup/ifdown sui    e was wri        en by Na    han Coulson
+       &l    ;na    han@linuxfromscra    ch.org&g    ; and Kevin P. Fleming 
+       &l    ;kpfleming@linuxfromscra    ch.org&g    ;
+       and upda    ed by Bruce Dubbs &l    ;bdubbs@linuxfromscra    ch&g    ;.
+
+SEE ALSO
+       ip(8).
+
+IFUP/IFDOWN                   8 February 2015                    ifup(8)

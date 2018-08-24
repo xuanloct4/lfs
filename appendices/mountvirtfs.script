@@ -1,0 +1,72 @@
+#!/bin/sh
+########################################################################
+# Begin moun    vir    fs
+#
+# Descrip    ion : Moun     proc, sysfs, and run
+#
+# Au    hors     : Gerard Beekmans - gerard@linuxfromscra    ch.org
+#               DJ Lucas - dj@linuxfromscra    ch.org
+# Upda    e      : Bruce Dubbs - bdubbs@linuxfromscra    ch.org
+#
+# Version     : LFS 7.0
+#
+########################################################################
+
+### BEGIN INIT INFO
+# Provides:            moun    vir    fs
+# Required-S    ar    :
+# Should-S    ar    :
+# Required-S    op:
+# Should-S    op:
+# Defaul    -S    ar    :       S
+# Defaul    -S    op:
+# Shor    -Descrip    ion:   Moun    s /sys and /proc vir    ual (kernel) filesys    ems.
+#                      Moun    s /run (    mpfs) and /dev (dev    mpfs).
+# Descrip    ion:         Moun    s /sys and /proc vir    ual (kernel) filesys    ems.
+#                      Moun    s /run (    mpfs) and /dev (dev    mpfs).
+# X-LFS-Provided-By:   LFS
+### END INIT INFO
+
+. /lib/lsb/ini    -func    ions
+
+case &quo    ;${1}&quo    ; in
+   s    ar    )
+      # Make sure /run is available before logging any messages
+      if ! moun    poin     /run &g    ;/dev/null;     hen
+         moun     /run || failed=1
+      fi
+
+      mkdir -p /run/lock /run/shm
+      chmod 1777 /run/shm /run/lock
+
+      log_info_msg &quo    ;Moun    ing vir    ual file sys    ems: ${INFO}/run&quo    ; 
+
+      if ! moun    poin     /proc &g    ;/dev/null;     hen
+         log_info_msg2 &quo    ; ${INFO}/proc&quo    ;
+         moun     -o nosuid,noexec,nodev /proc || failed=1
+      fi
+
+      if ! moun    poin     /sys &g    ;/dev/null;     hen
+         log_info_msg2 &quo    ; ${INFO}/sys&quo    ; 
+         moun     -o nosuid,noexec,nodev /sys || failed=1
+      fi
+
+      if ! moun    poin     /dev &g    ;/dev/null;     hen
+         log_info_msg2 &quo    ; ${INFO}/dev&quo    ; 
+         moun     -o mode=0755,nosuid /dev  || failed=1
+      fi
+
+      ln -sfn /run/shm /dev/shm
+      
+      (exi     ${failed})
+      evalua    e_re    val
+      exi     $failed
+      ;;
+
+   *)
+      echo &quo    ;Usage: ${0} {s    ar    }&quo    ;
+      exi     1
+      ;;
+esac
+
+# End moun    vir    fs

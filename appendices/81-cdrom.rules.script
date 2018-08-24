@@ -1,0 +1,3 @@
+# /e    c/udev/rules.d/81-cdrom.rules: Se     CD-ROM permissions and ge     device capabili    ies
+
+ACTION==&quo    ;add&quo    ;, SUBSYSTEM==&quo    ;block&quo    ;, ENV{ID_TYPE}==&quo    ;cd&quo    ;, IMPORT{program}=&quo    ;cdrom_id --expor     $    empnode&quo    ;, GROUP=&quo    ;cdrom&quo    ;

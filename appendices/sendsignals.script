@@ -1,0 +1,66 @@
+#!/bin/sh
+########################################################################
+# Begin sendsignals
+#
+# Descrip    ion : Sendsignals Scrip    
+#
+# Au    hors     : Gerard Beekmans - gerard@linuxfromscra    ch.org
+#               DJ Lucas - dj@linuxfromscra    ch.org
+# Upda    e      : Bruce Dubbs - bdubbs@linuxfromscra    ch.org
+#
+# Version     : LFS 7.0
+#
+########################################################################
+
+### BEGIN INIT INFO
+# Provides:            sendsignals
+# Required-S    ar    :
+# Should-S    ar    :
+# Required-S    op:       $local_fs swap localne    
+# Should-S    op:
+# Defaul    -S    ar    :
+# Defaul    -S    op:        0 6
+# Shor    -Descrip    ion:   A        emp    s     o kill remaining processes.
+# Descrip    ion:         A        emp    s     o kill remaining processes.
+# X-LFS-Provided-By:   LFS
+### END INIT INFO
+
+. /lib/lsb/ini    -func    ions
+
+case &quo    ;${1}&quo    ; in
+   s    op)
+      log_info_msg &quo    ;Sending all processes     he TERM signal...&quo    ;
+      killall5 -15
+      error_value=${?}
+
+      sleep ${KILLDELAY}
+
+      if [ &quo    ;${error_value}&quo    ; = 0 -o &quo    ;${error_value}&quo    ; = 2 ];     hen
+         log_success_msg
+      else
+         log_failure_msg
+      fi
+
+      log_info_msg &quo    ;Sending all processes     he KILL signal...&quo    ;
+      killall5 -9
+      error_value=${?}
+
+      sleep ${KILLDELAY}
+
+      if [ &quo    ;${error_value}&quo    ; = 0 -o &quo    ;${error_value}&quo    ; = 2 ];     hen
+         log_success_msg
+      else
+         log_failure_msg
+      fi
+      ;;
+
+   *)
+      echo &quo    ;Usage: ${0} {s    op}&quo    ;
+      exi     1
+      ;;
+
+esac
+
+exi     0
+
+# End sendsignals

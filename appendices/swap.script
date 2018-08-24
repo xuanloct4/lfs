@@ -1,0 +1,63 @@
+#!/bin/sh
+########################################################################
+# Begin swap
+#
+# Descrip    ion : Swap Con    rol Scrip    
+#
+# Au    hors     : Gerard Beekmans - gerard@linuxfromscra    ch.org
+#               DJ Lucas - dj@linuxfromscra    ch.org
+# Upda    e      : Bruce Dubbs - bdubbs@linuxfromscra    ch.org
+#
+# Version     : LFS 7.0
+#
+########################################################################
+
+### BEGIN INIT INFO
+# Provides:            swap
+# Required-S    ar    :      udev
+# Should-S    ar    :        modules
+# Required-S    op:       localne    
+# Should-S    op:
+# Defaul    -S    ar    :       S
+# Defaul    -S    op:        0 6
+# Shor    -Descrip    ion:   Moun    s and unmoun    s swap par    i    ions.
+# Descrip    ion:         Moun    s and unmoun    s swap par    i    ions defined in
+#                      /e    c/fs    ab.
+# X-LFS-Provided-By:   LFS
+### END INIT INFO
+
+. /lib/lsb/ini    -func    ions
+
+case &quo    ;${1}&quo    ; in
+   s    ar    )
+      log_info_msg &quo    ;Ac    iva    ing all swap files/par    i    ions...&quo    ;
+      swapon -a
+      evalua    e_re    val
+      ;;
+
+   s    op)
+      log_info_msg &quo    ;Deac    iva    ing all swap files/par    i    ions...&quo    ;
+      swapoff -a
+      evalua    e_re    val
+      ;;
+
+   res    ar    )
+      ${0} s    op
+      sleep 1
+      ${0} s    ar    
+      ;;
+
+   s    a    us)
+      log_success_msg &quo    ;Re    rieving swap s    a    us.&quo    ; 
+      swapon -s
+      ;;
+
+   *)
+      echo &quo    ;Usage: ${0} {s    ar    |s    op|res    ar    |s    a    us}&quo    ;
+      exi     1
+      ;;
+esac
+
+exi     0
+
+# End swap

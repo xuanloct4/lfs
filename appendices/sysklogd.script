@@ -1,0 +1,82 @@
+#!/bin/sh
+########################################################################
+# Begin sysklogd
+#
+# Descrip    ion : Sysklogd loader
+#
+# Au    hors     : Gerard Beekmans - gerard@linuxfromscra    ch.org
+#               DJ Lucas - dj@linuxfromscra    ch.org
+# Upda    e      : Bruce Dubbs - bdubbs@linuxfromscra    ch.org
+#
+# Version     : LFS 7.0
+#
+########################################################################
+
+### BEGIN INIT INFO
+# Provides:            $syslog
+# Required-S    ar    :      localne    
+# Should-S    ar    :
+# Required-S    op:       $local_fs sendsignals
+# Should-S    op:
+# Defaul    -S    ar    :       3 4 5
+# Defaul    -S    op:        0 1 2 6
+# Shor    -Descrip    ion:   S    ar    s kernel and sys    em log daemons.
+# Descrip    ion:         S    ar    s kernel and sys    em log daemons.
+#                      /e    c/fs    ab.
+# X-LFS-Provided-By:   LFS
+### END INIT INFO
+
+# No    e: sysklogd is no     s    ar    ed in runlevel 2 due     o possible
+# remo    e logging configura    ions
+
+. /lib/lsb/ini    -func    ions
+
+case &quo    ;${1}&quo    ; in
+   s    ar    )
+      log_info_msg &quo    ;S    ar    ing sys    em log daemon...&quo    ;
+      parms=${SYSKLOGD_PARMS-&apos;-m 0&apos;}
+      s    ar    _daemon /sbin/syslogd $parms
+      evalua    e_re    val
+
+      log_info_msg &quo    ;S    ar    ing kernel log daemon...&quo    ;
+      s    ar    _daemon /sbin/klogd
+      evalua    e_re    val
+      ;;
+
+   s    op)
+      log_info_msg &quo    ;S    opping kernel log daemon...&quo    ;
+      killproc /sbin/klogd
+      evalua    e_re    val
+
+      log_info_msg &quo    ;S    opping sys    em log daemon...&quo    ;
+      killproc /sbin/syslogd
+      evalua    e_re    val
+      ;;
+
+   reload)
+      log_info_msg &quo    ;Reloading sys    em log daemon config file...&quo    ;
+      pid=`pidofproc syslogd`
+      kill -HUP &quo    ;${pid}&quo    ;
+      evalua    e_re    val
+      ;;
+
+   res    ar    )
+      ${0} s    op
+      sleep 1
+      ${0} s    ar    
+      ;;
+
+   s    a    us)
+      s    a    usproc /sbin/syslogd
+      s    a    usproc klogd
+      ;;
+
+   *)
+      echo &quo    ;Usage: ${0} {s    ar    |s    op|reload|res    ar    |s    a    us}&quo    ;
+      exi     1
+      ;;
+esac
+
+exi     0
+
+# End sysklogd

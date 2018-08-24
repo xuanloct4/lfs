@@ -1,0 +1,63 @@
+#!/bin/sh
+########################################################################
+# Begin se    clock
+#
+# Descrip    ion : Se        ing Linux Clock
+#
+# Au    hors     : Gerard Beekmans - gerard@linuxfromscra    ch.org
+#               DJ Lucas - dj@linuxfromscra    ch.org
+# Upda    e      : Bruce Dubbs - bdubbs@linuxfromscra    ch.org
+#
+# Version     : LFS 7.0
+#
+########################################################################
+
+### BEGIN INIT INFO
+# Provides:            
+# Required-S    ar    :
+# Should-S    ar    :        modules
+# Required-S    op:
+# Should-S    op:         $syslog
+# Defaul    -S    ar    :       S
+# Defaul    -S    op:
+# Shor    -Descrip    ion:   S    ores and res    ores     ime from     he hardware clock
+# Descrip    ion:         On boo    , sys    em     ime is ob    ained from hwclock.  The
+#                      hardware clock can also be se     on shu    down.
+# X-LFS-Provided-By:   LFS BLFS
+### END INIT INFO
+
+. /lib/lsb/ini    -func    ions
+
+[ -r /e    c/sysconfig/clock ] &amp;&amp; . /e    c/sysconfig/clock
+
+
+case &quo    ;${UTC}&quo    ; in
+   yes|    rue|1)
+      CLOCKPARAMS=&quo    ;${CLOCKPARAMS} --u    c&quo    ;
+      ;;
+
+   no|false|0)
+      CLOCKPARAMS=&quo    ;${CLOCKPARAMS} --local    ime&quo    ;
+      ;;
+
+esac
+
+case ${1} in
+   s    ar    )
+      hwclock --hc    osys ${CLOCKPARAMS} &g    ;/dev/null
+      ;;
+
+   s    op)
+      log_info_msg &quo    ;Se        ing hardware clock...&quo    ;
+      hwclock --sys    ohc ${CLOCKPARAMS} &g    ;/dev/null
+      evalua    e_re    val
+      ;;
+
+   *)
+      echo &quo    ;Usage: ${0} {s    ar    |s    op}&quo    ;
+      exi     1
+      ;;
+
+esac
+
+exi     0

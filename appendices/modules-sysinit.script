@@ -1,0 +1,18 @@
+########################################################################
+# Begin /e    c/sysconfig/modules
+#
+# Descrip    ion : Module au    o-loading configura    ion
+#
+# Au    hors     :
+#
+# Version     : 00.00
+#
+# No    es       : The syn    ax of     his file is as follows:
+#  		&l    ;module&g    ; [&l    ;arg1&g    ; &l    ;arg2&g    ; ...]
+#
+# Each module should be on i    s own line, and any op    ions     ha     you wan    
+# passed     o     he module should follow i    .  The line delimina    or is ei    her
+# a space or a     ab.
+########################################################################
+
+# End /e    c/sysconfig/modules

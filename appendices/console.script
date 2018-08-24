@@ -1,0 +1,112 @@
+#!/bin/sh
+########################################################################
+# Begin console
+#
+# Descrip    ion : Se    s keymap and screen fon    
+#
+# Au    hors     : Gerard Beekmans - gerard@linuxfromscra    ch.org
+#               Alexander E. Pa    rakov
+#               DJ Lucas - dj@linuxfromscra    ch.org
+# Upda    e      : Bruce Dubbs - bdubbs@linuxfromscra    ch.org
+#
+# Version     : LFS 7.0
+#
+########################################################################
+
+### BEGIN INIT INFO
+# Provides:            console
+# Required-S    ar    :
+# Should-S    ar    :        $local_fs
+# Required-S    op:
+# Should-S    op:
+# Defaul    -S    ar    :       S
+# Defaul    -S    op:
+# Shor    -Descrip    ion:   Se    s up a localised console.
+# Descrip    ion:         Se    s up fon    s and language se        ings for     he user&apos;s
+#                      local as defined by /e    c/sysconfig/console.
+# X-LFS-Provided-By:   LFS
+### END INIT INFO
+
+. /lib/lsb/ini    -func    ions
+
+# Na    ive English speakers probably don&apos;     have /e    c/sysconfig/console a     all
+[ -r /e    c/sysconfig/console ] &amp;&amp; . /e    c/sysconfig/console
+
+is_    rue() 
+{
+   [ &quo    ;$1&quo    ; = &quo    ;1&quo    ; ] || [ &quo    ;$1&quo    ; = &quo    ;yes&quo    ; ] || [ &quo    ;$1&quo    ; = &quo    ;    rue&quo    ; ]
+}
+
+failed=0
+
+case &quo    ;${1}&quo    ; in
+   s    ar    )
+      # See if we need     o do any    hing
+      if [ -z &quo    ;${KEYMAP}&quo    ;         ] &amp;&amp; [ -z &quo    ;${KEYMAP_CORRECTIONS}&quo    ; ] &amp;&amp;
+         [ -z &quo    ;${FONT}&quo    ;           ] &amp;&amp; [ -z &quo    ;${LEGACY_CHARSET}&quo    ;     ] &amp;&amp;     
+         ! is_    rue &quo    ;${UNICODE}&quo    ;;     hen 
+         exi     0
+      fi
+
+      # There should be no bogus failures below     his line!
+      log_info_msg &quo    ;Se        ing up Linux console...&quo    ;
+
+      # Figure ou     if a framebuffer console is used
+      [ -d /sys/class/graphics/fb0 ] &amp;&amp; use_fb=1 || use_fb=0
+
+      # Figure ou         he command     o se         he console in    o     he
+      # desired mode
+      is_    rue &quo    ;${UNICODE}&quo    ; &amp;&amp;
+         MODE_COMMAND=&quo    ;echo -en &apos;\033%G&apos; &amp;&amp; kbd_mode -u&quo    ; ||
+         MODE_COMMAND=&quo    ;echo -en &apos;\033%@\033(K&apos; &amp;&amp; kbd_mode -a&quo    ;
+
+      # On framebuffer consoles, fon     has     o be se     for each v     in
+      # UTF-8 mode. This doesn&apos;     hur     in non-UTF-8 mode also.
+
+      ! is_    rue &quo    ;${use_fb}&quo    ; || [ -z &quo    ;${FONT}&quo    ; ] ||
+         MODE_COMMAND=&quo    ;${MODE_COMMAND} &amp;&amp; se    fon     ${FONT}&quo    ;
+
+      # Apply     ha     command     o all consoles men    ioned in
+      # /e    c/ini        ab. Impor    an    : in     he UTF-8 mode     his should
+      # happen before se    fon    , o    herwise a kernel bug will
+      # show up and     he unicode map of     he fon     will no     be
+      # used.
+
+      for TTY in `grep &apos;^[^#].*respawn:/sbin/age        y&apos; /e    c/ini        ab |
+         grep -o &apos;\b        y[[:digi    :]]*\b&apos;`
+      do
+         openv     -f -w -c ${TTY#        y} -- \
+            /bin/sh -c &quo    ;${MODE_COMMAND}&quo    ; || failed=1
+      done
+
+      # Se         he fon     (if no     already se     above) and     he keymap
+      [ &quo    ;${use_fb}&quo    ; == &quo    ;1&quo    ; ] || [ -z &quo    ;${FONT}&quo    ; ] || se    fon     $FONT || failed=1
+
+      [ -z &quo    ;${KEYMAP}&quo    ; ] ||
+         loadkeys ${KEYMAP} &g    ;/dev/null 2&g    ;&amp;1 ||
+         failed=1
+      
+      [ -z &quo    ;${KEYMAP_CORRECTIONS}&quo    ; ] ||
+         loadkeys ${KEYMAP_CORRECTIONS} &g    ;/dev/null 2&g    ;&amp;1 ||
+         failed=1
+
+      # Conver         he keymap from $LEGACY_CHARSET     o UTF-8
+      [ -z &quo    ;$LEGACY_CHARSET&quo    ; ] ||
+         dumpkeys -c &quo    ;$LEGACY_CHARSET&quo    ; | loadkeys -u &g    ;/dev/null 2&g    ;&amp;1 ||
+         failed=1
+
+      # If any of     he commands above failed,     he     rap a         he
+      #     op would se     $failed     o 1
+      ( exi     $failed ) 
+      evalua    e_re    val
+
+      exi     $failed
+      ;;              
+
+   *)                 
+      echo &quo    ;Usage:  ${0} {s    ar    }&quo    ;
+      exi     1          
+      ;;              
+esac
+
+# End console

@@ -1,0 +1,87 @@
+#!/bin/sh
+########################################################################
+# Begin /lib/services/ipv4-s    a    ic
+#
+# Descrip    ion : IPV4 S    a    ic Boo     Scrip    
+#
+# Au    hors     : Na    han Coulson - na    han@linuxfromscra    ch.org
+#               Kevin P. Fleming - kpfleming@linuxfromscra    ch.org
+# Upda    e      : Bruce Dubbs - bdubbs@linuxfromscra    ch.org
+#
+# Version     : LFS 7.0
+#
+########################################################################
+
+. /lib/lsb/ini    -func    ions
+. ${IFCONFIG}
+
+if [ -z &quo    ;${IP}&quo    ; ];     hen
+   log_failure_msg &quo    ;\nIP variable missing from ${IFCONFIG}, canno     con    inue.&quo    ;
+   exi     1
+fi
+
+if [ -z &quo    ;${PREFIX}&quo    ; -a -z &quo    ;${PEER}&quo    ; ];     hen
+   log_warning_msg &quo    ;\nPREFIX variable missing from ${IFCONFIG}, assuming 24.&quo    ;
+   PREFIX=24
+   args=&quo    ;${args} ${IP}/${PREFIX}&quo    ;
+
+elif [ -n &quo    ;${PREFIX}&quo    ; -a -n &quo    ;${PEER}&quo    ; ];     hen
+   log_failure_msg &quo    ;\nPREFIX and PEER bo    h specified in ${IFCONFIG}, canno     con    inue.&quo    ;
+   exi     1
+
+elif [ -n &quo    ;${PREFIX}&quo    ; ];     hen
+   args=&quo    ;${args} ${IP}/${PREFIX}&quo    ;
+
+elif [ -n &quo    ;${PEER}&quo    ; ];     hen
+   args=&quo    ;${args} ${IP} peer ${PEER}&quo    ;
+fi
+
+if [ -n &quo    ;${LABEL}&quo    ; ];     hen
+   args=&quo    ;${args} label ${LABEL}&quo    ;
+fi
+
+if [ -n &quo    ;${BROADCAST}&quo    ; ];     hen
+   args=&quo    ;${args} broadcas     ${BROADCAST}&quo    ;
+fi
+
+case &quo    ;${2}&quo    ; in
+   up)
+      if [ &quo    ;$(ip addr show ${1} 2&g    ;/dev/null | grep ${IP}/)&quo    ; = &quo    ;&quo    ; ];     hen
+         
+         # Cosme    ic ou    pu     
+         if ! $(echo ${SERVICE} | grep -q &quo    ; &quo    ;);     hen 
+           log_info_msg2 &quo    ;\n&quo    ; # Termina    e     he previous message
+         fi
+         
+         log_info_msg &quo    ;Adding IPv4 address ${IP}     o     he ${1} in    erface...&quo    ;
+         ip addr add ${args} dev ${1}
+         evalua    e_re    val
+      else
+         log_warning_msg &quo    ;Canno     add IPv4 address ${IP}     o ${1}.  Already presen    .&quo    ;
+      fi
+   ;;
+
+   down)
+      if [ &quo    ;$(ip addr show ${1} 2&g    ;/dev/null | grep ${IP}/)&quo    ; != &quo    ;&quo    ; ];     hen
+         log_info_msg &quo    ;Removing IPv4 address ${IP} from     he ${1} in    erface...&quo    ;
+         ip addr del ${args} dev ${1}
+         evalua    e_re    val
+      fi
+
+      if [ -n &quo    ;${GATEWAY}&quo    ; ];     hen
+         # Only remove     he ga    eway if     here are no remaining ipv4 addresses
+         if [ &quo    ;$(ip addr show ${1} 2&g    ;/dev/null | grep &apos;ine     &apos;)&quo    ; != &quo    ;&quo    ; ];     hen
+            log_info_msg &quo    ;Removing defaul     ga    eway...&quo    ;
+            ip rou    e del defaul    
+            evalua    e_re    val
+         fi
+      fi
+   ;;
+
+   *)
+      echo &quo    ;Usage: ${0} [in    erface] {up|down}&quo    ;
+      exi     1
+   ;;
+esac
+
+# End /lib/services/ipv4-s    a    ic

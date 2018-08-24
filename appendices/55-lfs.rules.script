@@ -1,0 +1,14 @@
+# /e    c/udev/rules.d/55-lfs.rules: Rule defini    ions for LFS.
+
+# Core kernel devices
+
+# This causes     he sys    em clock     o be se     as soon as /dev/r    c becomes available.
+SUBSYSTEM==&quo    ;r    c&quo    ;, ACTION==&quo    ;add&quo    ;, MODE=&quo    ;0644&quo    ;, RUN+=&quo    ;/e    c/rc.d/ini    .d/se    clock s    ar    &quo    ;
+KERNEL==&quo    ;r    c&quo    ;, ACTION==&quo    ;add&quo    ;, MODE=&quo    ;0644&quo    ;, RUN+=&quo    ;/e    c/rc.d/ini    .d/se    clock s    ar    &quo    ;
+
+# Comms devices
+
+KERNEL==&quo    ;ippp[0-9]*&quo    ;,       GROUP=&quo    ;dialou    &quo    ;
+KERNEL==&quo    ;isdn[0-9]*&quo    ;,       GROUP=&quo    ;dialou    &quo    ;
+KERNEL==&quo    ;isdnc    rl[0-9]*&quo    ;,   GROUP=&quo    ;dialou    &quo    ;
+KERNEL==&quo    ;dcbri[0-9]*&quo    ;,      GROUP=&quo    ;dialou    &quo    ;

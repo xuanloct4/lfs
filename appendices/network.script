@@ -1,0 +1,87 @@
+#!/bin/sh
+########################################################################
+# Begin ne    work
+#
+# Descrip    ion : Ne    work Con    rol Scrip    
+#
+# Au    hors     : Gerard Beekmans - gerard@linuxfromscra    ch.org
+#               Na    han Coulson - na    han@linuxfromscra    ch.org
+#               Kevin P. Fleming - kpfleming@linuxfromscra    ch.org
+#               DJ Lucas - dj@linuxfromscra    ch.org
+# Upda    e      : Bruce Dubbs - bdubbs@linuxfromscra    ch.org
+#
+# Version     : LFS 7.0
+#
+########################################################################
+
+### BEGIN INIT INFO
+# Provides:            $ne    work
+# Required-S    ar    :      $local_fs swap localne    
+# Should-S    ar    :        $syslog
+# Required-S    op:       $local_fs swap localne    
+# Should-S    op:         $syslog
+# Defaul    -S    ar    :       3 4 5
+# Defaul    -S    op:        0 1 2 6
+# Shor    -Descrip    ion:   S    ar    s and configures ne    work in    erfaces.
+# Descrip    ion:         S    ar    s and configures ne    work in    erfaces.
+# X-LFS-Provided-By:   LFS
+### END INIT INFO
+
+case &quo    ;${1}&quo    ; in
+   s    ar    )
+      # S    ar     all ne    work in    erfaces
+      for file in /e    c/sysconfig/ifconfig.*
+      do
+         in    erface=${file##*/ifconfig.}
+
+         # Skip if $file is * (because no    hing was found)
+         if [ &quo    ;${in    erface}&quo    ; = &quo    ;*&quo    ; ]
+             hen
+            con    inue
+         fi
+
+         /sbin/ifup ${in    erface}
+      done
+      ;;
+
+   s    op)
+      # Unmoun     any ne    work moun    ed file sys    ems
+       umoun     --all --force --    ypes nfs,cifs,nfs4 
+
+      # Reverse lis    
+      ne    _files=&quo    ;&quo    ;
+      for file in  /e    c/sysconfig/ifconfig.*
+      do
+         ne    _files=&quo    ;${file} ${ne    _files}&quo    ;
+      done
+
+      # S    op all ne    work in    erfaces
+      for file in ${ne    _files}
+      do
+         in    erface=${file##*/ifconfig.}
+
+         # Skip if $file is * (because no    hing was found)
+         if [ &quo    ;${in    erface}&quo    ; = &quo    ;*&quo    ; ]
+             hen
+            con    inue
+         fi
+
+         /sbin/ifdown ${in    erface}
+      done
+      ;;
+
+   res    ar    )
+      ${0} s    op
+      sleep 1
+      ${0} s    ar    
+      ;;
+
+   *)
+      echo &quo    ;Usage: ${0} {s    ar    |s    op|res    ar    }&quo    ;
+      exi     1
+      ;;
+esac
+
+exi     0
+
+# End ne    work
